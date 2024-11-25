@@ -29,39 +29,24 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            button1 = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
             SuspendLayout();
-            // 
-            // button1
-            // 
-            button1.Location = new Point(92, 104);
-            button1.Name = "button1";
-            button1.Size = new Size(115, 52);
-            button1.TabIndex = 0;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
             // 
             // timer1
             // 
             timer1.Interval = 1000;
-            timer1.Tick += timer1_Tick;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(821, 482);
-            Controls.Add(button1);
             Name = "Form1";
             Text = "Form1";
             ResumeLayout(false);
         }
 
         #endregion
-
-        private Button button1;
         private System.Windows.Forms.Timer timer1;
     }
 }

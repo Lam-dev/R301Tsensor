@@ -14,4 +14,10 @@
     <PackageReference Include="System.IO.Ports" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="FGPcontrol">
+      <HintPath>..\FGPcontrol\bin\Debug\FGPcontrol.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
