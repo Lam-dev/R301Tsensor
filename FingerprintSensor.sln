@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGPcontrol", "..\FGPcontrol\FGPcontrol.csproj", "{5A76FC1B-5640-4FAF-98AD-A8451CC6536E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGPcontrol", "FGPcontrol\FGPcontrol.csproj", "{5A76FC1B-5640-4FAF-98AD-A8451CC6536E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "..\Test\Test.csproj", "{5C69FE38-6FA1-4DDE-B776-11732DC3415F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{5C69FE38-6FA1-4DDE-B776-11732DC3415F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
