@@ -100,6 +100,7 @@ namespace SmartCard
 
         public void ConnectSensor()
         {
+            
             _serial = new SerialPort(_port, 57600);
             _serial.ReadTimeout = 2500;
 
@@ -511,9 +512,6 @@ namespace SmartCard
 
             return GetSystemParameters().Item3;
         }
-
-      
-
 
         public bool ReadImage()
         {
@@ -950,7 +948,6 @@ namespace SmartCard
             var characterics = DownloadCharacteristics(charBufferNumber);
             return characterics.SequenceEqual(characteristicsData);
         }
-
 
         public int StoreTemplate(int positionNumber = -1, byte charBufferNumber = FINGERPRINT_CHARBUFFER1)
         {

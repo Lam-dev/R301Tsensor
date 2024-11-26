@@ -15,21 +15,24 @@ using System.Reflection;
 namespace FGPcontrol
 {
     public delegate void GetFGPresult(bool result, string error, List<byte>charateristics);
+    public delegate void FGPcheckResult(bool match,  int index);
     public partial class FGPcontroller : UserControl
     {
         public event GetFGPresult EventGetFGPresult;
+        public event FGPcheckResult EventUserChecked;
         private static global::System.Globalization.CultureInfo resourceCulture;
         bool __flagLockFGPsensor = false;
         int __addFGPstep = 1;
+        int __justFinishStep = 1;
         bool __fingerPrintHoldOn = false;
         int __numberWrongPrePos = 0;
         FingerprintSensor __fingerprintObj = null;
         int __numberFGPimageShow = 0;
         bool __flagSensorConnected = false;
+        bool __textIsShow = true; //for blink text
         public FGPcontroller()
         {
             InitializeComponent();
-            
         }
 
         public void ConnectSensor(string comport)
@@ -45,34 +48,69 @@ namespace FGPcontrol
             {
                 return false;
             }
+            timer_checkFGP.Stop();
+            __ReturnBeginAddFGPstep();
             timer_getFGPfeature.Start();
             return true;
+        }
+
+        void __BlinkText()
+        {
+            label_notificationText.Invoke((MethodInvoker)(() => { label_notificationText.Visible = __textIsShow;}));
+            __textIsShow = !__textIsShow;
         }
 
         public void StopGetFGP()
         {
             timer_getFGPfeature.Stop();
         }
+
+        public bool AddTemplate(int index, List<byte> charateristics)
+        {
+            timer_getFGPfeature.Stop();
+            timer_checkFGP.Stop();
+            if (__flagLockFGPsensor)
+            {
+                return false;
+            }
+            var result = __fingerprintObj.UploadCharacteristics(0x01, charateristics);
+            if (result)
+            {
+                __fingerprintObj.StoreTemplate(index, 0x01);
+            }
+            return result;
+        }
+
+        public bool StartCheckFGP()
+        {
+            timer_getFGPfeature.Stop();
+            timer_checkFGP.Start();
+            return true;
+        }
+
+        
         void GetFGPstepByStep()
         {
             if (__flagLockFGPsensor)
             {
                 return;
             }
+            //__BlinkText();
             __flagLockFGPsensor = true;
             if (__addFGPstep == 1)
             {
                 try
                 {
+                    StatusNotify(AddFingerprintNotificationEnum.PushOn);
                     if (__fingerprintObj.ReadImage())
                     {
                         try
                         {
                             __fingerprintObj.ConvertImage(0x01);
-                            label_notificationText.Invoke((MethodInvoker)(() => timer_showFGPimageAnimation.Start()));
-                           
+                            ShowFPGanimation(1);
+
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             __fingerPrintHoldOn = true;
                         }
@@ -112,20 +150,19 @@ namespace FGPcontrol
                                 if (__numberWrongPrePos == 4)
                                 {
                                     __addFGPstep = 1;
-                                    label_notificationText.Invoke((MethodInvoker)(() => timer_showFGPimageAnimation.Start()));
+                                    ShowFPGanimation(1);
                                     __numberWrongPrePos = 0;
                                 }
                                 StatusNotify(AddFingerprintNotificationEnum.WrongPose);
                             }
                             else
                             {
-                                label_notificationText.Invoke((MethodInvoker)(() => timer_showFGPimageAnimation.Start()));
+                                ShowFPGanimation(2);
                                 __fingerPrintHoldOn = true;
                                 __addFGPstep = 3;
 
                             }
                         }
-
                     }
                     else
                     {
@@ -164,20 +201,18 @@ namespace FGPcontrol
                                 if (__numberWrongPrePos == 4)
                                 {
                                     __addFGPstep = 1;
-                                    label_notificationText.Invoke((MethodInvoker)(() => timer_showFGPimageAnimation.Start()));
+                                    ShowFPGanimation(2);
                                     __numberWrongPrePos = 0;
                                 }
                             }
                             else {
-                                StatusNotify(AddFingerprintNotificationEnum.Ok);
+                                ShowFPGanimation(3);
                                 __addFGPstep = 3;
-                                label_notificationText.Invoke((MethodInvoker)(() => timer_showFGPimageAnimation.Start()));
                                 __fingerPrintHoldOn = true;
                                 DownloadCharacteristic();
 
                             }
                         }
-
                     }
                     else
                     {
@@ -185,11 +220,25 @@ namespace FGPcontrol
                         StatusNotify(AddFingerprintNotificationEnum.PushOn);
                     }
                 }
-                catch { 
-                    
+                catch {
                 }
             }
             __flagLockFGPsensor = false;
+        }
+        void ShowFPGanimation(int step)
+        {
+            __justFinishStep = step;
+            label_notificationText.Invoke((MethodInvoker)(() => timer_showFGPimageAnimation.Start()));
+
+        }
+
+        void __ReturnBeginAddFGPstep()
+        {
+            __addFGPstep = 1;
+            __justFinishStep = 1;
+            __numberWrongPrePos = 0;
+            StatusNotify(AddFingerprintNotificationEnum.PushOn);
+            pictureBox_showFGPicon.Image = Icon._0;
         }
 
         void DownloadCharacteristic()
@@ -199,20 +248,21 @@ namespace FGPcontrol
             {
                 EventGetFGPresult(true, "", lstFGPfeature);
             }
-            __addFGPstep = 0;
-            __numberWrongPrePos = 0;
-            __numberFGPimageShow = 0;
+            //__addFGPstep = 1;
+            //__numberWrongPrePos = 0;
+            //__numberFGPimageShow = 0;
+            StatusNotify(AddFingerprintNotificationEnum.Ok);
             label_notificationText.Invoke((MethodInvoker)(() => timer_getFGPfeature.Stop()));
         }
 
         private void timer_showFGPimageAnimation_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine($"step = {__addFGPstep}");
-            if (__numberFGPimageShow > __addFGPstep * 5)
+            Console.WriteLine($"step = {__numberFGPimageShow}");
+            if (__numberFGPimageShow > __justFinishStep * 5)
             {
-                __numberFGPimageShow = (__addFGPstep - 1) * 5;
+                __numberFGPimageShow = (__justFinishStep - 1) * 5;
             }
-            else if (__numberFGPimageShow == __addFGPstep * 5)
+            else if (__numberFGPimageShow == __justFinishStep * 5)
             {
                 timer_showFGPimageAnimation.Stop();
             }
@@ -230,8 +280,8 @@ namespace FGPcontrol
                 pictureBox_notificationIcon.Invoke((MethodInvoker)(() => pictureBox_notificationIcon.Image = Icon.put55));
                 label_notificationText.Invoke((MethodInvoker)(() =>
                 {
-                    label_notificationText.Text = "TIẾP TỤC ĐẶT TAY LÊN CẢM BIẾN";
-
+                    label_notificationText.Text = "ĐẶT TAY LÊN CẢM BIẾN";
+                    label_notificationText.ForeColor = Color.Blue;
                 }));
             }
 
@@ -241,6 +291,7 @@ namespace FGPcontrol
                 label_notificationText.Invoke((MethodInvoker)(() =>
                 {
                     label_notificationText.Text = "NHẤC TAY RA KHỎI CẢM BIẾN";
+                    label_notificationText.ForeColor = Color.Blue;
 
                 }));
             }
@@ -251,7 +302,7 @@ namespace FGPcontrol
                 label_notificationText.Invoke((MethodInvoker)(() =>
                 {
                     label_notificationText.Text = "KHÔNG THAY ĐỔI VỊ TRÍ NGÓN TAY, NHẤC TAY ĐẶT LẠI";
-
+                    label_notificationText.ForeColor = Color.Red;
                 }));
             }
 
@@ -261,6 +312,7 @@ namespace FGPcontrol
                 label_notificationText.Invoke((MethodInvoker)(() =>
                 {
                     label_notificationText.Text = "ĐÃ LẤY VÂN TAY THÀNH CÔNG. XIN CẢM ƠN !";
+                    label_notificationText.ForeColor = Color.Green;
 
                 }));
             }
@@ -274,6 +326,37 @@ namespace FGPcontrol
                 GetFGPstepByStep();
             }).Start();
         }
+
+        private void timer_checkFGP_Tick(object sender, EventArgs e)
+        {
+            new Thread(() => {
+                try
+                {
+                    if (__fingerprintObj.ReadImage())
+                    {
+                        __fingerprintObj.ConvertImage(0x01);
+                        var findIndex = __fingerprintObj.SearchTemplate();
+
+                        if (EventUserChecked != null)
+                        {
+                            if (findIndex.Item1 == -1)
+                            {
+                                EventUserChecked(false, -1);
+                            }
+                            else
+                            {
+                                EventUserChecked(true, findIndex.Item1);
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+
+                }
+            }).Start();
+        }
+
     }
 
     enum AddFingerprintNotificationEnum

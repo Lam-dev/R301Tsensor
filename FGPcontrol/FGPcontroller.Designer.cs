@@ -35,6 +35,7 @@
             this.label_notificationText = new System.Windows.Forms.Label();
             this.pictureBox_notificationIcon = new System.Windows.Forms.PictureBox();
             this.pictureBox_showFGPicon = new System.Windows.Forms.PictureBox();
+            this.timer_checkFGP = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_notificationIcon)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_showFGPicon)).BeginInit();
             this.SuspendLayout();
@@ -55,18 +56,19 @@
             // 
             // label_notificationText
             // 
-            this.label_notificationText.AutoSize = true;
-            this.label_notificationText.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_notificationText.Location = new System.Drawing.Point(74, 151);
+            this.label_notificationText.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_notificationText.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.label_notificationText.Location = new System.Drawing.Point(62, 137);
             this.label_notificationText.Name = "label_notificationText";
-            this.label_notificationText.Size = new System.Drawing.Size(326, 29);
+            this.label_notificationText.Size = new System.Drawing.Size(398, 57);
             this.label_notificationText.TabIndex = 2;
-            this.label_notificationText.Text = "Nhấc tay ra khỏi cảm biến. ";
+            this.label_notificationText.Text = "ĐẶT TAY LÊN CẢM BIẾN";
+            this.label_notificationText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pictureBox_notificationIcon
             // 
             this.pictureBox_notificationIcon.InitialImage = global::FGPcontrol.Icon.put55;
-            this.pictureBox_notificationIcon.Location = new System.Drawing.Point(7, 137);
+            this.pictureBox_notificationIcon.Location = new System.Drawing.Point(-3, 137);
             this.pictureBox_notificationIcon.Name = "pictureBox_notificationIcon";
             this.pictureBox_notificationIcon.Size = new System.Drawing.Size(61, 57);
             this.pictureBox_notificationIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -79,9 +81,14 @@
             this.pictureBox_showFGPicon.Location = new System.Drawing.Point(158, 12);
             this.pictureBox_showFGPicon.Name = "pictureBox_showFGPicon";
             this.pictureBox_showFGPicon.Size = new System.Drawing.Size(128, 113);
-            this.pictureBox_showFGPicon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox_showFGPicon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox_showFGPicon.TabIndex = 0;
             this.pictureBox_showFGPicon.TabStop = false;
+            // 
+            // timer_checkFGP
+            // 
+            this.timer_checkFGP.Interval = 1500;
+            this.timer_checkFGP.Tick += new System.EventHandler(this.timer_checkFGP_Tick);
             // 
             // FGPcontroller
             // 
@@ -95,7 +102,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_notificationIcon)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_showFGPicon)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -107,5 +113,6 @@
         private System.Windows.Forms.Timer timer_showFGPimageAnimation;
         private System.Windows.Forms.PictureBox pictureBox_notificationIcon;
         private System.Windows.Forms.Label label_notificationText;
+        private System.Windows.Forms.Timer timer_checkFGP;
     }
 }
